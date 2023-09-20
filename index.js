@@ -8,7 +8,7 @@ const API_URL = "https://secrets-api.appbrewery.com/";
 //TODO 1: Fill in your values for the 3 types of auth.
 const yourUsername = "sujimon";
 const yourPassword = "Sujimon@22";
-const yourAPIKey = "82848f57-0e5d-43da-817c-afb8c13af32d";
+const yourAPIKey = "e4847211-7717-4be0-b8e4-78aa91b6ddeb";
 const yourBearerToken = "ae8369e6-777b-456b-9e5a-3728368fb262";
 
 app.get("/", (req, res) => {
@@ -28,8 +28,7 @@ app.get("/noAuth", async(req, res) => {
   }  
 });
 
-
-app.get("/basicAuth", (req, res) => {
+app.get("/basicAuth", async(req, res) => {
   //TODO 3: Write your code here to hit up the /all endpoint
   //Specify that you only want the secrets from page 2
   //HINT: This is how you can use axios to do basic auth:
@@ -42,15 +41,31 @@ app.get("/basicAuth", (req, res) => {
       },
     });
   */
+    try{
+      const responseObj = await axios.get(`${API_URL}all?page=2`,{auth:{username:"sujimon",password:"Sujimon@22"}});
+      const responseStr = JSON.stringify(responseObj.data);
+      res.render('index.ejs',{content: responseStr});
+    }catch(error){
+      res.render('index.ejs',{content: error});
+    } 
 });
 
-app.get("/apiKey", (req, res) => {
+
+app.get("/apiKey", async (req, res) => {
   //TODO 4: Write your code here to hit up the /filter endpoint
   //Filter for all secrets with an embarassment score of 5 or greater
   //HINT: You need to provide a query parameter of apiKey in the request.
+  try{
+    const responseObj = await axios.get(`${API_URL}filter?score=5&apiKey=${yourAPIKey}`);
+    const responseStr = JSON.stringify(responseObj.data);
+    res.render('index.ejs',{content: responseStr});
+  }catch(error){
+    res.render('index.ejs',{content: error});
+  }
 });
 
-app.get("/bearerToken", (req, res) => {
+
+app.get("/bearerToken", async(req, res) => {
   //TODO 5: Write your code here to hit up the /secrets/{id} endpoint
   //and get the secret with id of 42
   //HINT: This is how you can use axios to do bearer token auth:
@@ -62,7 +77,16 @@ app.get("/bearerToken", (req, res) => {
     },
   });
   */
+  try{
+    const responseObj = await axios.get(`${API_URL}secrets/42`,{headers:{Authorization: `Bearer ${yourBearerToken}`}});
+    const responseStr = JSON.stringify(responseObj.data);
+    res.render('index.ejs',{content: responseStr});
+  }catch(error){
+    res.render('index.ejs',{content: error});
+  } 
 });
+
+
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
